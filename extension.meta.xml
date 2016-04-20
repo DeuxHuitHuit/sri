@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension id="sri" status="experimental" xmlns="http://getsymphony.com/schemas/extension/1.0">
+	<name>Subresource Integrity</name>
+	<description>
+		A simple way to compute base64 encoded sha (256, 384, 512) of assets files used in `link` and `script` tags.
+
+		You specify the files in a xml file and get the results with the provided data source
+
+		See https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity for more details
+	</description>
+	<repo type="github">https://github.com/DeuxHuitHuit/sri</repo>
+	<url type="discuss">http://www.getsymphony.com/discuss/thread//</url>
+	<url type="issues">https://github.com/DeuxHuitHuit/sri/issues</url>
+	<types>
+		<type>Subresource</type>
+		<type>Integrity</type>
+	</types>
+	<authors>
+		<author>
+			<name github="DeuxHuitHuit" symphony="nitriques" twitter="DeuxHuitHuit">Deux Huit Huit</name>
+			<website>https://deuxhuithuit.com/</website>
+		</author>
+	</authors>
+	<dependencies>
+		<!-- None -->
+	</dependencies>
+	<releases>
+		<release version="1.0.0" date="TBA" min="2.6.0" max="2.x.x">
+			- First release
+		</release>
+	</releases>
+</extension>
