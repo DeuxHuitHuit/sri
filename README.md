@@ -29,7 +29,7 @@ For more information, see <http://getsymphony.com/learn/tasks/view/install-an-ex
 ### HOW TO USE
 
 1. Create the `manifest/sri.xml` file
-2. [Fill it up](#sri-xml-file)
+2. [Fill it up](#srixml-file)
 3. Add the SRI data sources on pages that needs it.
 4. [Set the `integrity` attribute accordingly](#integrity-attribute)
 
