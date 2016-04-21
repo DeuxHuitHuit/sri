@@ -6,7 +6,7 @@
 
 		You specify the files in a xml file and get the results with the provided data source
 
-		See https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity for more details
+		See https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity for more details on SRI.
 	</description>
 	<repo type="github">https://github.com/DeuxHuitHuit/sri</repo>
 	<url type="discuss">http://www.getsymphony.com/discuss/thread//</url>
@@ -25,7 +25,7 @@
 		<!-- None -->
 	</dependencies>
 	<releases>
-		<release version="1.0.0" date="TBA" min="2.6.0" max="2.x.x">
+		<release version="1.0.0" date="2016-04-20" min="2.6.0" max="2.x.x">
 			- First release
 		</release>
 	</releases>
