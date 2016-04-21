@@ -78,6 +78,10 @@ The data source outputs some useful information. Also, any exception thrown in t
     + `hit`: Integrity value found in cache
     + `disabled`: Cache is disabled
 
+#### Caching
+
+This extension uses Symphony's database driven cache provider in order to prevent reading each file and computing the hash on each request. The cache ttl is 30 days, but the data source checks the file modified time before using any value from the cache. If the file changed, the hash is updated.
+
 ### LICENSE
 
 [MIT](http://deuxhuithuit.mit-license.org)
