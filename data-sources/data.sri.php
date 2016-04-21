@@ -54,11 +54,11 @@ class datasourceSri extends DataSource
 			$files = $this->getFiles();
 			foreach ($files as $file) {
 				$xmlfile = new XMLElement('file');
-				$cache = 'hit';
+				$cache = $this->dsCache ? 'hit' : 'disabled';
 				$filepath = DOCROOT . '/' . $file['file'];
 				$integrity = $this->getCachedIntegrity($file, $filepath);
 				if (!$integrity) {
-					$cache = 'miss';
+					$cache = $this->dsCache ? 'miss' : 'disabled';
 					$filecontent = @file_get_contents($filepath);
 					if (!$filecontent) {
 						$result->appendChild(new XMLElement('error', 'Could not read `' . $filepath . '`'));
