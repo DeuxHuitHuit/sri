@@ -13,9 +13,14 @@ require_once FACE . '/interface.datasource.php';
 class datasourceSri extends DataSource
 {
 	public $dsFilesPath;
+	public $dsCache = true;
+	private $dsCacheProvider;
+	public $dsCacheNamespace = 'sri';
+	public $dsCacheTTL = 43200; // 60 * 24 * 30;
 
 	public function __construct() {
 		$this->dsFilesPath = MANIFEST . '/sri.xml';
+		$this->dsCacheProvider = new Cacheable(Symphony::Database());
 	}
 
 	/**
@@ -49,24 +54,34 @@ class datasourceSri extends DataSource
 			$files = $this->getFiles();
 			foreach ($files as $file) {
 				$xmlfile = new XMLElement('file');
+				$cache = 'hit';
 				$filepath = DOCROOT . '/' . $file['file'];
-				$filecontent = @file_get_contents($filepath);
-				if (!$filecontent) {
-					$xmlfile->appendChild(new XMLElement('error', 'Could not read `' . $filepath . '`'));
-				}
-				else {
+				$integrity = $this->getCachedIntegrity($file, $filepath);
+				if (!$integrity) {
+					$cache = 'miss';
+					$filecontent = @file_get_contents($filepath);
+					if (!$filecontent) {
+						$result->appendChild(new XMLElement('error', 'Could not read `' . $filepath . '`'));
+						continue;
+					}
+					
 					$integrity = $this->computeIntegrity($file['hash'], $filecontent);
-					$xmlfile->setAttribute('filename', basename($file['file']));
-					$xmlfile->setAttribute('hash', $file['hash']);
-					$xmlfile->setAttribute('integrity', $integrity);
-					$xmlfile->setValue($file['file']);
+					if ($this->saveIntegrityToCache($file, $filepath, $integrity)) {
+						$cache = 'saved-miss';
+					}
 				}
+				$xmlfile->setAttribute('filename', basename($file['file']));
+				$xmlfile->setAttribute('hash', $file['hash']);
+				$xmlfile->setAttribute('integrity', $integrity);
+				$xmlfile->setAttribute('cache', $cache);
+				$xmlfile->setValue($file['file']);
+				
 				$result->appendChild($xmlfile);
 			}
 		}
 		catch (Exception $ex) {
-			Symphony::Logs()->pushExceptionToLog($ex, true);
-			$result->appendChild(new XMLElement('error', $ex->getMessage()));
+			Symphony::Log()->pushExceptionToLog($ex, true);
+			$result->appendChild(new XMLElement('error', General::wrapInCDATA($ex->getMessage())));
 		}
 		return $result;
 	}
@@ -100,5 +115,39 @@ class datasourceSri extends DataSource
 
 	private function computeIntegrity($hash, $value) {
 		return $hash . '-' . base64_encode(hash($hash, $value, true));
+	}
+
+	private function createCacheKey(array $file) {
+		return md5(implode('.', array_values($file)));
+	}
+
+	private function getCachedIntegrity(array $file, $filepath) {
+		if (!$this->dsCache) {
+			return null;
+		}
+		if (!@file_exists($filepath)) {
+			return null;
+		}
+		$key = $this->createCacheKey($file);
+		$cache = $this->dsCacheProvider->read($key);
+		if (!$cache || !isset($cache['creation'])) {
+			return null;
+		}
+		if ($cache['creation'] < filemtime($filepath)) {
+			return null;
+		}
+		return $cache['data'];
+	}
+
+	private function saveIntegrityToCache(array $file, $filepath, $integrity) {
+		if (!$this->dsCache) {
+			return false;
+		}
+		$key = $this->createCacheKey($file);
+		if (empty($integrity)) {
+			$this->dsCacheProvider->delete($key, $this->dsCacheNamespace);
+			return false;
+		}
+		return $this->dsCacheProvider->write($key, $integrity, $this->dsCacheTTL, $this->dsCacheNamespace);
 	}
 }
