@@ -12,6 +12,12 @@ require_once FACE . '/interface.datasource.php';
 
 class datasourceSri extends DataSource
 {
+	public $dsFilesPath;
+
+	public function __construct() {
+		$this->dsFilesPath = MANIFEST . '/sri.xml';
+	}
+
 	/**
 	 * About this data source
 	 */
@@ -39,7 +45,60 @@ class datasourceSri extends DataSource
 	 */
 	public function execute(array &$param_pool=NULL) {
 		$result = new XMLElement('sri');
-		
+		try {
+			$files = $this->getFiles();
+			foreach ($files as $file) {
+				$xmlfile = new XMLElement('file');
+				$filepath = DOCROOT . '/' . $file['file'];
+				$filecontent = @file_get_contents($filepath);
+				if (!$filecontent) {
+					$xmlfile->appendChild(new XMLElement('error', 'Could not read `' . $filepath . '`'));
+				}
+				else {
+					$integrity = $this->computeIntegrity($file['hash'], $filecontent);
+					$xmlfile->setAttribute('filename', basename($file['file']));
+					$xmlfile->setAttribute('hash', $file['hash']);
+					$xmlfile->setAttribute('integrity', $integrity);
+					$xmlfile->setValue($file['file']);
+				}
+				$result->appendChild($xmlfile);
+			}
+		}
+		catch (Exception $ex) {
+			Symphony::Logs()->pushExceptionToLog($ex, true);
+			$result->appendChild(new XMLElement('error', $ex->getMessage()));
+		}
 		return $result;
+	}
+
+	private function getFiles() {
+		if (!@file_exists($this->dsFilesPath)) {
+			return array();
+		}
+		$files = array();
+		$xml = @simplexml_load_file($this->dsFilesPath);
+		if (!$xml) {
+			throw new Exception('Could not load xml file');
+		}
+		$defaultHash = (string)current($xml->xpath('/*/@hash'));
+		if (empty($defaultHash)) {
+			$defaultHash = 'sha384';
+		}
+		$xmlfiles = $xml->xpath('/*/file');
+		foreach ($xmlfiles as $file) {
+			$fileHash = (string)current($file->xpath('@hash'));
+			if (empty($fileHash)) {
+				$fileHash = $defaultHash;
+			}
+			$files[] = array(
+				'file' => (string)$file,
+				'hash' => $fileHash,
+			);
+		}
+		return $files;
+	}
+
+	private function computeIntegrity($hash, $value) {
+		return $hash . '-' . base64_encode(hash($hash, $value, true));
 	}
 }
