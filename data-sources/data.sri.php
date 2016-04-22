@@ -59,13 +59,14 @@ class datasourceSri extends DataSource
 				$integrity = $this->getCachedIntegrity($file, $filepath);
 				if (!$integrity) {
 					$cache = $this->dsCache ? 'miss' : 'disabled';
-					$filecontent = @file_get_contents($filepath);
-					if (!$filecontent) {
-						$result->appendChild(new XMLElement('error', 'Could not read `' . $filepath . '`'));
+
+					$integrity = $this->computeIntegrity($file, $filepath);
+
+					if (!$integrity) {
+						$result->appendChild(new XMLElement('error', 'Could not hash `' . $filepath . '`'));
 						continue;
 					}
-					
-					$integrity = $this->computeIntegrity($file['hash'], $filecontent);
+
 					if ($this->saveIntegrityToCache($file, $filepath, $integrity)) {
 						$cache = 'saved-miss';
 					}
@@ -113,8 +114,12 @@ class datasourceSri extends DataSource
 		return $files;
 	}
 
-	private function computeIntegrity($hash, $value) {
-		return $hash . '-' . base64_encode(hash($hash, $value, true));
+	private function computeIntegrity(array $file, $filepath) {
+		$hash = @hash_file($file['hash'], $filepath, true);
+		if (!$hash) {
+			return null;
+		}
+		return $file['hash'] . '-' . base64_encode($hash);
 	}
 
 	private function createCacheKey(array $file) {
