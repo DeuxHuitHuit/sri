@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<extension id="sri" status="experimental" xmlns="http://getsymphony.com/schemas/extension/1.0">
+<extension id="sri" status="released" xmlns="http://getsymphony.com/schemas/extension/1.0">
 	<name>Subresource Integrity</name>
 	<description>
 		A simple way to compute base64 encoded sha (256, 384, 512) of assets files used in `link` and `script` tags.
@@ -22,6 +22,9 @@
 		<!-- None -->
 	</dependencies>
 	<releases>
+		<release version="1.0.1" date="2016-04-21" min="2.6.0" max="2.x.x">
+			- Use `hash_file()` instead of `hash(file_get_contents())`
+		</release>
 		<release version="1.0.0" date="2016-04-20" min="2.6.0" max="2.x.x">
 			- First release
 		</release>
