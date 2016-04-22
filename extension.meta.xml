@@ -3,10 +3,6 @@
 	<name>Subresource Integrity</name>
 	<description>
 		A simple way to compute base64 encoded sha (256, 384, 512) of assets files used in `link` and `script` tags.
-
-		You specify the files in a xml file and get the results with the provided data source
-
-		See https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity for more details on SRI.
 	</description>
 	<repo type="github">https://github.com/DeuxHuitHuit/sri</repo>
 	<url type="discuss">http://www.getsymphony.com/discuss/thread/111868/</url>
