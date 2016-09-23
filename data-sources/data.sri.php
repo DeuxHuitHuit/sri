@@ -115,6 +115,9 @@ class datasourceSri extends DataSource
 	}
 
 	private function computeIntegrity(array $file, $filepath) {
+		if (!@file_exists($filepath)) {
+			return null;
+		}
 		$hash = @hash_file($file['hash'], $filepath, true);
 		if (!$hash) {
 			return null;
