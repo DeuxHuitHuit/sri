@@ -141,6 +141,7 @@ class datasourceSri extends DataSource
 		if (!$cache || !isset($cache['creation'])) {
 			return null;
 		}
+		clearstatcache();
 		if ($cache['creation'] < filemtime($filepath)) {
 			return null;
 		}
