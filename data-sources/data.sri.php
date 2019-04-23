@@ -21,6 +21,9 @@ class datasourceSri extends DataSource
 	public function __construct() {
 		$this->dsFilesPath = MANIFEST . '/sri.xml';
 		$this->dsCacheProvider = new Cacheable(Symphony::Database());
+		if (defined('HTTP_HOST')) {
+			$this->dsCacheNamespace .= '-' . HTTP_HOST;
+		}
 	}
 
 	/**
@@ -109,6 +112,7 @@ class datasourceSri extends DataSource
 			$files[] = array(
 				'file' => (string)$file,
 				'hash' => $fileHash,
+				'namespace' => $this->dsCacheNamespace,
 			);
 		}
 		return $files;
