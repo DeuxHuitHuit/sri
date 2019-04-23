@@ -1,7 +1,5 @@
 # Subresource Integrity
 
-Version: 1.0.x
-
 > A simple way to compute base64 encoded sha (256, 384, 512) of assets files used in `link` and `script` tags.
 
 ### SPECS
